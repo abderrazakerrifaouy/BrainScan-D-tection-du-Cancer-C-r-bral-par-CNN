@@ -24,6 +24,8 @@ class Preprocessor:
         self._X_test = None
         self._y_train = None
         self._y_test = None
+        self._X_val = None
+        self._y_val = None
 
     def load_images(self):
         images = []
@@ -90,6 +92,8 @@ class Preprocessor:
         encoded_labels = label_encoder.fit_transform(self.labels)
         self.labels = encoded_labels
 
+        return self.labels
+
     def normalize_images(self):
         if self.images.size == 0:
             raise ValueError("Aucune image à normaliser. Chargez d'abord les images.")
@@ -123,6 +127,33 @@ class Preprocessor:
         if self._X_test is None or self._y_test is None:
             raise ValueError("Les données de test n'ont pas été générées. Appelez d'abord split_data().")
         return self._X_test, self._y_test
+
+    def get_validation_data(self):
+        if self._X_val is None or self._y_val is None:
+            raise ValueError("Les données de validation n'ont pas été générées. Appelez d'abord split_data_validation().")
+        return self._X_val, self._y_val
+
+    def split_data_validation(self):
+        if self._X_train is None or self._y_train is None:
+            raise ValueError("Les données d'entraînement n'ont pas été générées. Appelez d'abord split_data().")
+
+        X_train, X_val, y_train, y_val = train_test_split(
+            self._X_train,
+            self._y_train,
+            test_size=0.2,
+            random_state=42,
+            stratify=self._y_train
+        )
+
+        self._X_train = X_train
+        self._X_val = X_val
+        self._y_train = y_train
+        self._y_val = y_val
+
+        
+
+        
+
 
     
 if __name__ == "__main__":
